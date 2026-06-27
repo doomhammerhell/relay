@@ -1,34 +1,106 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Functionality for calculating if a trace should be processed or dropped."><meta name="keywords" content="rust, rustlang, rust-lang, relay_sampling"><title>relay_sampling - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../relay_sampling/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../relay_sampling/index.html"><div class="logo-container">
-                    <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate relay_sampling</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 22.5.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="relay_sampling" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../relay_sampling/index.html">
-                        <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">relay_sampling</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/relay_sampling/lib.rs.html#1-1927">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Functionality for calculating if a trace should be processed or dropped.</p>
-</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AndCondition.html" title="relay_sampling::AndCondition struct">AndCondition</a></div><div class="item-right docblock-short"><p>And condition combinator.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CustomCondition.html" title="relay_sampling::CustomCondition struct">CustomCondition</a></div><div class="item-right docblock-short"><p>Condition that cover custom operators which need
-special handling and have a custom implementation
-for each case.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EqCondOptions.html" title="relay_sampling::EqCondOptions struct">EqCondOptions</a></div><div class="item-right docblock-short"><p>A condition that checks the values using the equality operator.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EqCondition.html" title="relay_sampling::EqCondition struct">EqCondition</a></div><div class="item-right docblock-short"><p>A condition that checks for equality</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.GlobCondition.html" title="relay_sampling::GlobCondition struct">GlobCondition</a></div><div class="item-right docblock-short"><p>A condition that uses glob matching.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.GtCondition.html" title="relay_sampling::GtCondition struct">GtCondition</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.GteCondition.html" title="relay_sampling::GteCondition struct">GteCondition</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LtCondition.html" title="relay_sampling::LtCondition struct">LtCondition</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LteCondition.html" title="relay_sampling::LteCondition struct">LteCondition</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NotCondition.html" title="relay_sampling::NotCondition struct">NotCondition</a></div><div class="item-right docblock-short"><p>Not condition combinator.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OrCondition.html" title="relay_sampling::OrCondition struct">OrCondition</a></div><div class="item-right docblock-short"><p>Or condition combinator.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RuleId.html" title="relay_sampling::RuleId struct">RuleId</a></div><div class="item-right docblock-short"><p>Sampling rule Id</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SamplingConfig.html" title="relay_sampling::SamplingConfig struct">SamplingConfig</a></div><div class="item-right docblock-short"><p>Represents the dynamic sampling configuration available to a project.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SamplingRule.html" title="relay_sampling::SamplingRule struct">SamplingRule</a></div><div class="item-right docblock-short"><p>A sampling rule as it is deserialized from the project configuration.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TraceContext.html" title="relay_sampling::TraceContext struct">TraceContext</a></div><div class="item-right docblock-short"><p>TraceContext created by the first Sentry SDK in the call chain.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TraceUserContext.html" title="relay_sampling::TraceUserContext struct">TraceUserContext</a></div><div class="item-right docblock-short"><p>The User related information in the trace context</p>
-</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.RuleCondition.html" title="relay_sampling::RuleCondition enum">RuleCondition</a></div><div class="item-right docblock-short"><p>A condition from a sampling rule.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.RuleType.html" title="relay_sampling::RuleType enum">RuleType</a></div><div class="item-right docblock-short"><p>Defines the type of dynamic rule, i.e. to which type of events it will be applied and how.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SamplingResult.html" title="relay_sampling::SamplingResult enum">SamplingResult</a></div><div class="item-right docblock-short"><p>The result of a sampling operation returned by <a href="struct.TraceContext.html#method.should_keep" title="TraceContext::should_keep"><code>TraceContext::should_keep</code></a>.</p>
-</div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.get_matching_event_rule.html" title="relay_sampling::get_matching_event_rule fn">get_matching_event_rule</a></div><div class="item-right docblock-short"><p>Returns the first event rule that matches the event.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.pseudo_random_from_uuid.html" title="relay_sampling::pseudo_random_from_uuid fn">pseudo_random_from_uuid</a></div><div class="item-right docblock-short"><p>Generates a pseudo random number by seeding the generator with the given id.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.rule_type_for_event.html" title="relay_sampling::rule_type_for_event fn">rule_type_for_event</a></div><div class="item-right docblock-short"><p>Returns the type of rule that applies to a particular event.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="relay_sampling" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
-</body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Sampling logic for performing sampling decisions of incoming events."><title>relay_sampling - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="relay_sampling" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../static.files/storage-41dd4d93.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc mod crate"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate relay_sampling</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../relay_sampling/index.html"><img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></a><h2><a href="../relay_sampling/index.html">relay_<wbr>sampling</a><span class="version">26.6.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#types-of-sampling" title="Types of Sampling">Types of Sampling</a></li><li><a href="#components" title="Components">Components</a></li><li><a href="#how-it-works" title="How It Works">How It Works</a></li><li><a href="#determinism" title="Determinism">Determinism</a></li><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#samplingconfig" title="`SamplingConfig`"><code>SamplingConfig</code></a></li><li><a href="#dynamicsamplingcontext" title="`DynamicSamplingContext`"><code>DynamicSamplingContext</code></a></li></ul></li></ul><h3><a href="#reexports">Crate Items</a></h3><ul class="block"><li><a href="#reexports" title="Re-exports">Re-exports</a></li><li><a href="#modules" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1>Crate <span>relay_<wbr>sampling</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/relay_sampling/lib.rs.html#1-81">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Sampling logic for performing sampling decisions of incoming events.</p>
+<p>In order to allow Sentry to offer performance at scale, Relay extracts key <code>metrics</code> from all
+transactions, but only forwards a random sample of raw transaction payloads to the upstream.
+What exact percentage is sampled is determined by <code>dynamic sampling rules</code>, and depends on the
+project, the environment, the transaction name, etc.</p>
+<p>In order to determine the sample rate, Relay uses a <a href="config/struct.SamplingConfig.html" title="struct relay_sampling::config::SamplingConfig"><code>SamplingConfig</code></a> which contains a set of
+<a href="config/struct.SamplingRule.html" title="struct relay_sampling::config::SamplingRule"><code>SamplingRule</code></a>s that are matched against incoming data.</p>
+<h2 id="types-of-sampling"><a class="doc-anchor" href="#types-of-sampling">§</a>Types of Sampling</h2>
+<p>There are two main types of dynamic sampling:</p>
+<ol>
+<li><strong>Trace sampling</strong> ensures that either all transactions of a trace are sampled or none. Rules
+have access to information in the <a href="dsc/struct.DynamicSamplingContext.html" title="struct relay_sampling::dsc::DynamicSamplingContext"><code>DynamicSamplingContext</code></a>.</li>
+<li><strong>Transaction sampling</strong> does not guarantee complete traces and instead applies to individual
+transactions. Rules have access to the full data in transaction events.</li>
+</ol>
+<h2 id="components"><a class="doc-anchor" href="#components">§</a>Components</h2>
+<p>The sampling system implemented in Relay is composed of the following components:</p>
+<ul>
+<li><a href="dsc/struct.DynamicSamplingContext.html" title="struct relay_sampling::dsc::DynamicSamplingContext"><code>DynamicSamplingContext</code></a>: a container for information associated with the trace.</li>
+<li><a href="config/struct.SamplingRule.html" title="struct relay_sampling::config::SamplingRule"><code>SamplingRule</code></a>: a rule that is matched against incoming data.
+It specifies a condition that acts as predicate on the incoming payload.</li>
+<li><a href="evaluation/struct.SamplingMatch.html" title="struct relay_sampling::evaluation::SamplingMatch"><code>SamplingMatch</code></a>: the result of the matching of one or more
+rules.</li>
+</ul>
+<h2 id="how-it-works"><a class="doc-anchor" href="#how-it-works">§</a>How It Works</h2>
+<ul>
+<li>The incoming data is received by Relay.</li>
+<li>Relay resolves the <a href="config/struct.SamplingConfig.html" title="struct relay_sampling::config::SamplingConfig"><code>SamplingConfig</code></a> of the project to which the incoming data belongs.
+Additionally, it tries to resolve the configuration of the project that started the trace, the
+so-called “root project”.</li>
+<li>The two <a href="config/struct.SamplingConfig.html" title="struct relay_sampling::config::SamplingConfig"><code>SamplingConfig</code></a>s are merged together and dynamic sampling evaluates a result. The
+algorithm goes over each rule and compute either a factor or sample rate based on the
+value of the rule.</li>
+<li>The <a href="evaluation/struct.SamplingMatch.html" title="struct relay_sampling::evaluation::SamplingMatch"><code>SamplingMatch</code></a> is finally returned containing the
+final <code>sample_rate</code> and some additional data that will be used in <code>relay_server</code> to perform
+the sampling decision.</li>
+</ul>
+<h2 id="determinism"><a class="doc-anchor" href="#determinism">§</a>Determinism</h2>
+<p>The concept of determinism is a core concept for dynamic sampling. Deterministic sampling
+decisions allow to:</p>
+<ul>
+<li>Run dynamic sampling repeatedly over a <strong>chain of Relays</strong> (e.g., we don’t want to drop an
+event that was retained by a previous Relay and vice-versa).</li>
+<li>Run dynamic sampling independently on <strong>transactions of the same trace</strong> (e.g., we want to be
+able to sample all the transactions of the same trace, even though some exceptions apply).</li>
+</ul>
+<p>In order to perform deterministic sampling, Relay uses teh trace ID or event ID as the seed for
+the random number generator.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="samplingconfig"><a class="doc-anchor" href="#samplingconfig">§</a><a href="config/struct.SamplingConfig.html" title="struct relay_sampling::config::SamplingConfig"><code>SamplingConfig</code></a></h3><div class="example-wrap"><pre class="language-json"><code>{
+  &quot;version&quot;: 2,
+  &quot;rules&quot;: [
+    {
+      &quot;condition&quot;: {
+        &quot;op&quot;: &quot;and&quot;,
+        &quot;inner&quot;: [
+          {
+            &quot;op&quot;: &quot;glob&quot;,
+            &quot;name&quot;: &quot;releases&quot;,
+            &quot;value&quot;: [
+              &quot;1.1.1&quot;,
+              &quot;1.1.2&quot;
+            ]
+          }
+        ]
+      },
+      &quot;samplingValue&quot;: {
+        &quot;type&quot;: &quot;sampleRate&quot;,
+        &quot;value&quot;: 0.7
+      },
+      &quot;type&quot;: &quot;transaction&quot;,
+      &quot;id&quot;: 2
+    },
+    {
+      &quot;condition&quot;: {
+        &quot;op&quot;: &quot;and&quot;,
+        &quot;inner&quot;: [
+          {
+            &quot;op&quot;: &quot;eq&quot;,
+            &quot;name&quot;: &quot;transaction&quot;,
+            &quot;value&quot;: &quot;/foo&quot;
+          }
+        ]
+      },
+      &quot;samplingValue&quot;: {
+        &quot;type&quot;: &quot;factor&quot;,
+        &quot;value&quot;: 5.0
+      },
+      &quot;type&quot;: &quot;trace&quot;,
+      &quot;id&quot;: 1,
+      &quot;timeRange&quot;: {
+        &quot;start&quot;: &quot;2022-10-10T00:00:00.000000Z&quot;,
+        &quot;end&quot;: &quot;2022-10-20T00:00:00.000000Z&quot;
+      }
+    }
+  ]
+}</code></pre></div><h3 id="dynamicsamplingcontext"><a class="doc-anchor" href="#dynamicsamplingcontext">§</a><a href="dsc/struct.DynamicSamplingContext.html" title="struct relay_sampling::dsc::DynamicSamplingContext"><code>DynamicSamplingContext</code></a></h3><div class="example-wrap"><pre class="language-json"><code>{
+  &quot;trace_id&quot;: &quot;00000000-0000-0000-0000-000000000001&quot;,
+  &quot;public_key&quot;: &quot;abd0f232775f45feab79864e580d160b&quot;,
+  &quot;release&quot;: &quot;1.0&quot;,
+  &quot;environment&quot;: &quot;dev&quot;,
+  &quot;transaction&quot;: &quot;/foo&quot;,
+  &quot;sample_rate&quot;: &quot;0.5&quot;,
+  &quot;user_id&quot;: &quot;some-id&quot;,
+  &quot;user_segment&quot;: &quot;all&quot;,
+  &quot;user&quot;: null
+}</code></pre></div></div></details><h2 id="reexports" class="section-header">Re-exports<a href="#reexports" class="anchor">§</a></h2><dl class="item-table reexports"><dt id="reexport.SamplingConfig"><code>pub use config::<a class="struct" href="config/struct.SamplingConfig.html" title="struct relay_sampling::config::SamplingConfig">SamplingConfig</a>;</code></dt><dt id="reexport.DynamicSamplingContext"><code>pub use dsc::<a class="struct" href="dsc/struct.DynamicSamplingContext.html" title="struct relay_sampling::dsc::DynamicSamplingContext">DynamicSamplingContext</a>;</code></dt></dl><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="config/index.html" title="mod relay_sampling::config">config</a></dt><dd>Dynamic sampling rule configuration.</dd><dt><a class="mod" href="dsc/index.html" title="mod relay_sampling::dsc">dsc</a></dt><dd>Contextual information stored on traces.</dd><dt><a class="mod" href="evaluation/index.html" title="mod relay_sampling::evaluation">evaluation</a></dt><dd>Evaluation of dynamic sampling rules.</dd></dl></section></div></main></body></html>

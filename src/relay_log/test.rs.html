@@ -1,68 +1,40 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `relay-log/src/test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../relay_log/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../relay_log/index.html"><div class="logo-container">
-                    <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../relay_log/index.html">
-                        <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
-<span id="2">2</span>
-<span id="3">3</span>
-<span id="4">4</span>
-<span id="5">5</span>
-<span id="6">6</span>
-<span id="7">7</span>
-<span id="8">8</span>
-<span id="9">9</span>
-<span id="10">10</span>
-<span id="11">11</span>
-<span id="12">12</span>
-<span id="13">13</span>
-<span id="14">14</span>
-<span id="15">15</span>
-<span id="16">16</span>
-<span id="17">17</span>
-<span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">log::LevelFilter</span>;
-
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__init_test</span>(<span class="ident">module_path</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-    <span class="kw">let</span> <span class="ident">crate_name</span> <span class="op">=</span> <span class="ident">module_path</span>.<span class="ident">split</span>(<span class="string">&quot;::&quot;</span>).<span class="ident">next</span>().<span class="ident">unwrap</span>();
-
-    <span class="ident">env_logger::builder</span>()
-        .<span class="ident">filter</span>(<span class="prelude-val">Some</span>(<span class="ident">crate_name</span>), <span class="ident">LevelFilter::Trace</span>)
-        .<span class="ident">is_test</span>(<span class="bool-val">true</span>)
-        .<span class="ident">try_init</span>()
-        .<span class="ident">ok</span>();
-}
-
-<span class="doccomment">/// Initialize the logger for testing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This logs to the stdout registered by the Rust test runner, and only captures logs from the</span>
-<span class="doccomment">/// calling crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// relay_log::init_test!();</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">init_test</span> {
-    () =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__init_test</span>(<span class="macro">::std::module_path!</span>());
-    };
-}
-</code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="relay_log" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
-</body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `relay-log/src/test.rs`."><title>test.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="relay_log" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">relay_log/</div>test.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>tracing_subscriber::EnvFilter;
+<a href=#2 id=2 data-nosnippet>2</a>
+<a href=#3 id=3 data-nosnippet>3</a><span class="comment">// Import CRATE_NAMES, which lists all crates in the workspace.
+<a href=#4 id=4 data-nosnippet>4</a></span><span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">"OUT_DIR"</span>), <span class="string">"/constants.gen.rs"</span>));
+<a href=#5 id=5 data-nosnippet>5</a>
+<a href=#6 id=6 data-nosnippet>6</a><span class="attr">#[doc(hidden)]
+<a href=#7 id=7 data-nosnippet>7</a></span><span class="kw">pub fn </span>__init_test() {
+<a href=#8 id=8 data-nosnippet>8</a>    <span class="kw">let </span><span class="kw-2">mut </span>env_filter = EnvFilter::new(<span class="string">"ERROR"</span>);
+<a href=#9 id=9 data-nosnippet>9</a>
+<a href=#10 id=10 data-nosnippet>10</a>    <span class="comment">// Add all internal modules with maximum log-level.
+<a href=#11 id=11 data-nosnippet>11</a>    </span><span class="kw">for </span>name <span class="kw">in </span>CRATE_NAMES {
+<a href=#12 id=12 data-nosnippet>12</a>        env_filter = env_filter.add_directive(<span class="macro">format!</span>(<span class="string">"{name}=TRACE"</span>).parse().unwrap());
+<a href=#13 id=13 data-nosnippet>13</a>    }
+<a href=#14 id=14 data-nosnippet>14</a>
+<a href=#15 id=15 data-nosnippet>15</a>    tracing_subscriber::fmt::fmt()
+<a href=#16 id=16 data-nosnippet>16</a>        .with_env_filter(env_filter)
+<a href=#17 id=17 data-nosnippet>17</a>        .with_target(<span class="bool-val">true</span>)
+<a href=#18 id=18 data-nosnippet>18</a>        .with_test_writer()
+<a href=#19 id=19 data-nosnippet>19</a>        .compact()
+<a href=#20 id=20 data-nosnippet>20</a>        .try_init()
+<a href=#21 id=21 data-nosnippet>21</a>        .ok();
+<a href=#22 id=22 data-nosnippet>22</a>}
+<a href=#23 id=23 data-nosnippet>23</a>
+<a href=#24 id=24 data-nosnippet>24</a><span class="doccomment">/// Initialize the logger for testing.
+<a href=#25 id=25 data-nosnippet>25</a>///
+<a href=#26 id=26 data-nosnippet>26</a>/// This logs to the stdout registered by the Rust test runner, and only captures logs from the
+<a href=#27 id=27 data-nosnippet>27</a>/// calling crate.
+<a href=#28 id=28 data-nosnippet>28</a>///
+<a href=#29 id=29 data-nosnippet>29</a>/// # Example
+<a href=#30 id=30 data-nosnippet>30</a>///
+<a href=#31 id=31 data-nosnippet>31</a>/// ```
+<a href=#32 id=32 data-nosnippet>32</a>/// relay_log::init_test!();
+<a href=#33 id=33 data-nosnippet>33</a>/// ```
+<a href=#34 id=34 data-nosnippet>34</a></span><span class="attr">#[macro_export]
+<a href=#35 id=35 data-nosnippet>35</a></span><span class="macro">macro_rules!</span> init_test {
+<a href=#36 id=36 data-nosnippet>36</a>    () =&gt; {
+<a href=#37 id=37 data-nosnippet>37</a>        <span class="macro-nonterminal">$crate::__init_test</span>();
+<a href=#38 id=38 data-nosnippet>38</a>    };
+<a href=#39 id=39 data-nosnippet>39</a>}
+</code></pre></div></section></main></body></html>

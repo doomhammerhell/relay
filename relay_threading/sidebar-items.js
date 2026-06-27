@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["AsyncPool","AsyncPoolBuilder","AsyncPoolMetrics","CustomSpawn","DefaultSpawn","Thread"],"trait":["ThreadSpawn"]};

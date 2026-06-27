@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Declares a message as part of an `Interface`."><title>FromMessage in relay_system - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="relay_system" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../static.files/storage-41dd4d93.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc trait"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">FromMessage</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../relay_system/index.html"><img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></a><h2><a href="../relay_system/index.html">relay_<wbr>system</a><span class="version">26.6.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">From<wbr>Message</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#no-response" title="No Response">No Response</a></li><li><a href="#asynchronous-responses" title="Asynchronous Responses">Asynchronous Responses</a></li><li><a href="#broadcast-responses" title="Broadcast Responses">Broadcast Responses</a></li></ul><h3><a href="#required-associated-types">Required Associated Types</a></h3><ul class="block"><li><a href="#associatedtype.Response" title="Response">Response</a></li></ul><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.from_message" title="from_message">from_message</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="index.html">In crate relay_<wbr>system</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="index.html">relay_system</a></div><h1>Trait <span class="trait">From<wbr>Message</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/relay_system/service/mod.rs.html#662-668">Source</a> </span></div><pre class="rust item-decl"><code>pub trait FromMessage&lt;M&gt;: <a class="trait" href="trait.Interface.html" title="trait relay_system::Interface">Interface</a> {
+    type <a href="#associatedtype.Response" class="associatedtype">Response</a>: <a class="trait" href="trait.MessageResponse.html" title="trait relay_system::MessageResponse">MessageResponse</a>;
+
+    // Required method
+    fn <a href="#tymethod.from_message" class="fn">from_message</a>(
+        message: M,
+        sender: &lt;Self::<a class="associatedtype" href="trait.FromMessage.html#associatedtype.Response" title="type relay_system::FromMessage::Response">Response</a> as <a class="trait" href="trait.MessageResponse.html" title="trait relay_system::MessageResponse">MessageResponse</a>&gt;::<a class="associatedtype" href="trait.MessageResponse.html#associatedtype.Sender" title="type relay_system::MessageResponse::Sender">Sender</a>,
+    ) -&gt; Self;
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Declares a message as part of an <a href="trait.Interface.html" title="trait relay_system::Interface"><code>Interface</code></a>.</p>
+<p>Messages have an associated <code>Response</code> type that determines the return value of sending the
+message. Within an interface, the responder can vary for each message. There are two provided
+responders.</p>
+<h2 id="no-response"><a class="doc-anchor" href="#no-response">§</a>No Response</h2>
+<p><a href="struct.NoResponse.html" title="struct relay_system::NoResponse"><code>NoResponse</code></a> is used for fire-and-forget messages that do not return any values. These
+messages do not spawn futures and cannot be awaited. It is neither possible to verify whether
+the message was delivered to the service.</p>
+<p>When implementing <code>FromMessage</code> for such messages, the second argument can be ignored by
+convention:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>relay_system::{FromMessage, Interface, NoResponse};
+
+<span class="kw">struct </span>MyMessage;
+
+<span class="kw">enum </span>MyInterface {
+    MyMessage(MyMessage),
+    <span class="comment">// ...
+</span>}
+
+<span class="kw">impl </span>Interface <span class="kw">for </span>MyInterface {}
+
+<span class="kw">impl </span>FromMessage&lt;MyMessage&gt; <span class="kw">for </span>MyInterface {
+    <span class="kw">type </span>Response = NoResponse;
+
+    <span class="kw">fn </span>from_message(message: MyMessage, <span class="kw">_</span>: ()) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::MyMessage(message)
+    }
+}</code></pre></div><h2 id="asynchronous-responses"><a class="doc-anchor" href="#asynchronous-responses">§</a>Asynchronous Responses</h2>
+<p><a href="struct.AsyncResponse.html" title="struct relay_system::AsyncResponse"><code>AsyncResponse</code></a> is used for messages that resolve to some future value. This value is sent
+back by the service through a <a href="struct.Sender.html" title="struct relay_system::Sender"><code>Sender</code></a>, which must be added into the interface:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>relay_system::{AsyncResponse, FromMessage, Interface, Sender};
+
+<span class="kw">struct </span>MyMessage;
+
+<span class="kw">enum </span>MyInterface {
+    MyMessage(MyMessage, Sender&lt;bool&gt;),
+    <span class="comment">// ...
+</span>}
+
+<span class="kw">impl </span>Interface <span class="kw">for </span>MyInterface {}
+
+<span class="kw">impl </span>FromMessage&lt;MyMessage&gt; <span class="kw">for </span>MyInterface {
+    <span class="kw">type </span>Response = AsyncResponse&lt;bool&gt;;
+
+    <span class="kw">fn </span>from_message(message: MyMessage, sender: Sender&lt;bool&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::MyMessage(message, sender)
+    }
+}</code></pre></div><h2 id="broadcast-responses"><a class="doc-anchor" href="#broadcast-responses">§</a>Broadcast Responses</h2>
+<p><a href="struct.BroadcastResponse.html" title="struct relay_system::BroadcastResponse"><code>BroadcastResponse</code></a> is similar to the previous asynchronous response, but it additionally
+allows to efficiently handle duplicate requests for services that debounce equivalent requests
+or cache results. On the requesting side, this behavior is identical to the asynchronous
+behavior, but it provides more utilities to the implementing service.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>relay_system::{BroadcastResponse, BroadcastSender, FromMessage, Interface};
+
+<span class="kw">struct </span>MyMessage;
+
+<span class="kw">enum </span>MyInterface {
+    MyMessage(MyMessage, BroadcastSender&lt;bool&gt;),
+    <span class="comment">// ...
+</span>}
+
+<span class="kw">impl </span>Interface <span class="kw">for </span>MyInterface {}
+
+<span class="kw">impl </span>FromMessage&lt;MyMessage&gt; <span class="kw">for </span>MyInterface {
+    <span class="kw">type </span>Response = BroadcastResponse&lt;bool&gt;;
+
+    <span class="kw">fn </span>from_message(message: MyMessage, sender: BroadcastSender&lt;bool&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::MyMessage(message, sender)
+    }
+}</code></pre></div>
+<p>See <a href="trait.Interface.html" title="trait relay_system::Interface"><code>Interface</code></a> for more examples on how to build interfaces using this trait and <a href="trait.Service.html" title="trait relay_system::Service"><code>Service</code></a>
+documentation for patterns and advice to handle messages.</p>
+</div></details><h2 id="required-associated-types" class="section-header">Required Associated Types<a href="#required-associated-types" class="anchor">§</a></h2><div class="methods"><details class="toggle" open><summary><section id="associatedtype.Response" class="method"><a class="src rightside" href="../src/relay_system/service/mod.rs.html#664">Source</a><h4 class="code-header">type <a href="#associatedtype.Response" class="associatedtype">Response</a>: <a class="trait" href="trait.MessageResponse.html" title="trait relay_system::MessageResponse">MessageResponse</a></h4></section></summary><div class="docblock"><p>The behavior declaring the return value when sending this message.</p>
+</div></details></div><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.from_message" class="method"><a class="src rightside" href="../src/relay_system/service/mod.rs.html#667">Source</a><h4 class="code-header">fn <a href="#tymethod.from_message" class="fn">from_message</a>(
+    message: M,
+    sender: &lt;Self::<a class="associatedtype" href="trait.FromMessage.html#associatedtype.Response" title="type relay_system::FromMessage::Response">Response</a> as <a class="trait" href="trait.MessageResponse.html" title="trait relay_system::MessageResponse">MessageResponse</a>&gt;::<a class="associatedtype" href="trait.MessageResponse.html#associatedtype.Sender" title="type relay_system::MessageResponse::Sender">Sender</a>,
+) -&gt; Self</h4></section></summary><div class="docblock"><p>Converts the message into the service interface.</p>
+</div></details></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.96.0/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../trait.impl/relay_system/service/trait.FromMessage.js" async></script></section></div></main></body></html>

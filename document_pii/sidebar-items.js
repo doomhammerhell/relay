@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["EnumOrStruct"],"fn":["find_rs_files","main","print_error"],"mod":["item_collector","pii_finder"],"struct":["Cli","Output"]};

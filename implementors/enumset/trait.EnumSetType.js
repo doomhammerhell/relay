@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["relay_general"] = [{"text":"impl EnumSetType for <a class=\"enum\" href=\"relay_general/processor/enum.ValueType.html\" title=\"enum relay_general::processor::ValueType\">ValueType</a>","synthetic":false,"types":["relay_general::processor::attrs::ValueType"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

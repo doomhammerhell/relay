@@ -1,332 +1,264 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `relay-redis/src/real.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>real.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../relay_redis/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../relay_redis/index.html"><div class="logo-container">
-                    <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../relay_redis/index.html">
-                        <img src="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
-<span id="2">2</span>
-<span id="3">3</span>
-<span id="4">4</span>
-<span id="5">5</span>
-<span id="6">6</span>
-<span id="7">7</span>
-<span id="8">8</span>
-<span id="9">9</span>
-<span id="10">10</span>
-<span id="11">11</span>
-<span id="12">12</span>
-<span id="13">13</span>
-<span id="14">14</span>
-<span id="15">15</span>
-<span id="16">16</span>
-<span id="17">17</span>
-<span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">failure::Fail</span>;
-<span class="kw">use</span> <span class="ident">r2d2</span>::{<span class="ident">Pool</span>, <span class="ident">PooledConnection</span>};
-<span class="kw">use</span> <span class="ident">redis::ConnectionLike</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::RedisConfig</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">redis</span>;
-
-<span class="doccomment">/// An error returned from `RedisPool`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Fail</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RedisError</span> {
-    <span class="doccomment">/// Failure in r2d2 pool.</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;failed to pool redis connection&quot;</span>)]</span>
-    <span class="ident">Pool</span>(<span class="attribute">#[<span class="ident">cause</span>]</span> <span class="ident">r2d2::Error</span>),
-
-    <span class="doccomment">/// Failure in Redis communication.</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;failed to communicate with redis&quot;</span>)]</span>
-    <span class="ident">Redis</span>(<span class="attribute">#[<span class="ident">cause</span>]</span> <span class="ident">redis::RedisError</span>),
-}
-
-<span class="kw">enum</span> <span class="ident">ConnectionInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Cluster</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">redis::cluster::ClusterConnection</span>),
-    <span class="ident">Single</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">redis::Connection</span>),
-}
-
-<span class="doccomment">/// A reference to a pooled connection from `PooledClient`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">ConnectionInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ConnectionLike</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">req_packed_command</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">redis::RedisResult</span><span class="op">&lt;</span><span class="ident">redis::Value</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">req_packed_command</span>(<span class="ident">cmd</span>),
-            <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">req_packed_command</span>(<span class="ident">cmd</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">req_packed_commands</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cmd</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">offset</span>: <span class="ident">usize</span>,
-        <span class="ident">count</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">redis::RedisResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">redis::Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">req_packed_commands</span>(<span class="ident">cmd</span>, <span class="ident">offset</span>, <span class="ident">count</span>),
-            <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">req_packed_commands</span>(<span class="ident">cmd</span>, <span class="ident">offset</span>, <span class="ident">count</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">get_db</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">ref</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">get_db</span>(),
-            <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">ref</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">get_db</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">check_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">check_connection</span>(),
-            <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">check_connection</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">ref</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">is_open</span>(),
-            <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">ref</span> <span class="ident">con</span>) =&gt; <span class="ident">con</span>.<span class="ident">is_open</span>(),
-        }
-    }
-}
-
-<span class="kw">enum</span> <span class="ident">PooledClientInner</span> {
-    <span class="ident">Cluster</span>(<span class="ident">PooledConnection</span><span class="op">&lt;</span><span class="ident">redis::cluster::ClusterClient</span><span class="op">&gt;</span>),
-    <span class="ident">Single</span>(<span class="ident">PooledConnection</span><span class="op">&lt;</span><span class="ident">redis::Client</span><span class="op">&gt;</span>),
-}
-
-<span class="doccomment">/// A pooled Redis client.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PooledClient</span> {
-    <span class="ident">inner</span>: <span class="ident">PooledClientInner</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PooledClient</span> {
-    <span class="doccomment">/// Returns a pooled connection to this client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Connection</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">PooledClientInner::Cluster</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">client</span>) =&gt; <span class="ident">ConnectionInner::Cluster</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">client</span>),
-            <span class="ident">PooledClientInner::Single</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">client</span>) =&gt; <span class="ident">ConnectionInner::Single</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">client</span>),
-        };
-
-        <span class="ident">Connection</span> { <span class="ident">inner</span> }
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">RedisPoolInner</span> {
-    <span class="ident">Cluster</span>(<span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">redis::cluster::ClusterClient</span><span class="op">&gt;</span>),
-    <span class="ident">Single</span>(<span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">redis::Client</span><span class="op">&gt;</span>),
-}
-
-<span class="doccomment">/// Abstraction over cluster vs non-cluster mode.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Even just writing a method that takes a command and executes it doesn&#39;t really work because</span>
-<span class="doccomment">/// there&#39;s both `Cmd` and `ScriptInvocation` to take care of, and both have sync vs async</span>
-<span class="doccomment">/// APIs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Basically don&#39;t waste your time here, if you want to abstract over this, consider</span>
-<span class="doccomment">/// upstreaming to the redis crate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RedisPool</span> {
-    <span class="ident">inner</span>: <span class="ident">RedisPoolInner</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">RedisPool</span> {
-    <span class="doccomment">/// Creates a `RedisPool` from configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">RedisConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">RedisError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">config</span> {
-            <span class="ident">RedisConfig::Cluster</span> { <span class="kw-2">ref</span> <span class="ident">cluster_nodes</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="ident">cluster_nodes</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>).<span class="ident">collect</span>();
-                <span class="ident"><span class="self">Self</span>::cluster</span>(<span class="ident">servers</span>)
-            }
-            <span class="ident">RedisConfig::Single</span>(<span class="kw-2">ref</span> <span class="ident">server</span>) =&gt; <span class="ident"><span class="self">Self</span>::single</span>(<span class="ident">server</span>),
-        }
-    }
-
-    <span class="doccomment">/// Creates a `RedisPool` in cluster configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cluster</span>(<span class="ident">servers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">RedisError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::builder</span>()
-            .<span class="ident">max_size</span>(<span class="number">24</span>)
-            .<span class="ident">build</span>(<span class="ident">redis::cluster::ClusterClient::open</span>(<span class="ident">servers</span>).<span class="ident">map_err</span>(<span class="ident">RedisError::Redis</span>)<span class="question-mark">?</span>)
-            .<span class="ident">map_err</span>(<span class="ident">RedisError::Pool</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">RedisPoolInner::Cluster</span>(<span class="ident">pool</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">RedisPool</span> { <span class="ident">inner</span> })
-    }
-
-    <span class="doccomment">/// Creates a `RedisPool` in single-node configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span>(<span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">RedisError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::builder</span>()
-            .<span class="ident">max_size</span>(<span class="number">24</span>)
-            .<span class="ident">build</span>(<span class="ident">redis::Client::open</span>(<span class="ident">server</span>).<span class="ident">map_err</span>(<span class="ident">RedisError::Redis</span>)<span class="question-mark">?</span>)
-            .<span class="ident">map_err</span>(<span class="ident">RedisError::Pool</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">RedisPoolInner::Single</span>(<span class="ident">pool</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">RedisPool</span> { <span class="ident">inner</span> })
-    }
-
-    <span class="doccomment">/// Returns a pooled connection to a client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PooledClient</span>, <span class="ident">RedisError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RedisPoolInner::Cluster</span>(<span class="kw-2">ref</span> <span class="ident">pool</span>) =&gt; {
-                <span class="ident">PooledClientInner::Cluster</span>(<span class="ident">pool</span>.<span class="ident">get</span>().<span class="ident">map_err</span>(<span class="ident">RedisError::Pool</span>)<span class="question-mark">?</span>)
-            }
-            <span class="ident">RedisPoolInner::Single</span>(<span class="kw-2">ref</span> <span class="ident">pool</span>) =&gt; {
-                <span class="ident">PooledClientInner::Single</span>(<span class="ident">pool</span>.<span class="ident">get</span>().<span class="ident">map_err</span>(<span class="ident">RedisError::Pool</span>)<span class="question-mark">?</span>)
-            }
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="ident">PooledClient</span> { <span class="ident">inner</span> })
-    }
-}
-</code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="relay_redis" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
-</body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `relay-redis/src/real.rs`."><title>real.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="relay_redis" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/getsentry/relay/master/artwork/relay-icon.png"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">relay_redis/</div>real.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>deadpool::Runtime;
+<a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>deadpool::managed::{BuildError, Manager, Metrics, Object, Pool, PoolError};
+<a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>redis::{Cmd, Pipeline, RedisFuture, Value};
+<a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>std::time::Duration;
+<a href=#5 id=5 data-nosnippet>5</a><span class="kw">use </span>thiserror::Error;
+<a href=#6 id=6 data-nosnippet>6</a>
+<a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span><span class="kw">crate</span>::config::RedisConfigOptions;
+<a href=#8 id=8 data-nosnippet>8</a><span class="kw">use </span><span class="kw">crate</span>::pool;
+<a href=#9 id=9 data-nosnippet>9</a>
+<a href=#10 id=10 data-nosnippet>10</a><span class="kw">pub use </span>redis;
+<a href=#11 id=11 data-nosnippet>11</a>
+<a href=#12 id=12 data-nosnippet>12</a><span class="doccomment">/// An error type that represents various failure modes when interacting with Redis.
+<a href=#13 id=13 data-nosnippet>13</a>///
+<a href=#14 id=14 data-nosnippet>14</a>/// This enum provides a unified error type for Redis-related operations, handling both
+<a href=#15 id=15 data-nosnippet>15</a>/// configuration issues and runtime errors that may occur during Redis interactions.
+<a href=#16 id=16 data-nosnippet>16</a></span><span class="attr">#[derive(Debug, Error)]
+<a href=#17 id=17 data-nosnippet>17</a></span><span class="kw">pub enum </span>RedisError {
+<a href=#18 id=18 data-nosnippet>18</a>    <span class="doccomment">/// An error that occurs during Redis configuration.
+<a href=#19 id=19 data-nosnippet>19</a>    </span><span class="attr">#[error(<span class="string">"failed to configure redis"</span>)]
+<a href=#20 id=20 data-nosnippet>20</a>    </span>Configuration,
+<a href=#21 id=21 data-nosnippet>21</a>
+<a href=#22 id=22 data-nosnippet>22</a>    <span class="doccomment">/// An error that occurs during communication with Redis.
+<a href=#23 id=23 data-nosnippet>23</a>    </span><span class="attr">#[error(<span class="string">"failed to communicate with redis: {0}"</span>)]
+<a href=#24 id=24 data-nosnippet>24</a>    </span>Redis(
+<a href=#25 id=25 data-nosnippet>25</a>        <span class="attr">#[source]
+<a href=#26 id=26 data-nosnippet>26</a>        #[from]
+<a href=#27 id=27 data-nosnippet>27</a>        </span>redis::RedisError,
+<a href=#28 id=28 data-nosnippet>28</a>    ),
+<a href=#29 id=29 data-nosnippet>29</a>
+<a href=#30 id=30 data-nosnippet>30</a>    <span class="doccomment">/// An error that occurs when interacting with the Redis connection pool.
+<a href=#31 id=31 data-nosnippet>31</a>    </span><span class="attr">#[error(<span class="string">"failed to interact with the redis pool: {0}"</span>)]
+<a href=#32 id=32 data-nosnippet>32</a>    </span>Pool(<span class="attr">#[source] </span>PoolError&lt;redis::RedisError&gt;),
+<a href=#33 id=33 data-nosnippet>33</a>
+<a href=#34 id=34 data-nosnippet>34</a>    <span class="doccomment">/// An error that occurs when creating a Redis connection pool.
+<a href=#35 id=35 data-nosnippet>35</a>    </span><span class="attr">#[error(<span class="string">"failed to create redis pool: {0}"</span>)]
+<a href=#36 id=36 data-nosnippet>36</a>    </span>CreatePool(<span class="attr">#[from] </span>BuildError),
+<a href=#37 id=37 data-nosnippet>37</a>}
+<a href=#38 id=38 data-nosnippet>38</a>
+<a href=#39 id=39 data-nosnippet>39</a><span class="doccomment">/// A collection of Redis clients used by Relay for different purposes.
+<a href=#40 id=40 data-nosnippet>40</a>///
+<a href=#41 id=41 data-nosnippet>41</a>/// This type manages separate Redis connection clients for different functionalities
+<a href=#42 id=42 data-nosnippet>42</a>/// within the Relay system, such as project configurations and rate limiting.
+<a href=#43 id=43 data-nosnippet>43</a></span><span class="attr">#[derive(Debug, Clone)]
+<a href=#44 id=44 data-nosnippet>44</a></span><span class="kw">pub struct </span>RedisClients {
+<a href=#45 id=45 data-nosnippet>45</a>    <span class="doccomment">/// The client used for project configurations
+<a href=#46 id=46 data-nosnippet>46</a>    </span><span class="kw">pub </span>project_configs: AsyncRedisClient,
+<a href=#47 id=47 data-nosnippet>47</a>    <span class="doccomment">/// The client used for rate limiting/quotas.
+<a href=#48 id=48 data-nosnippet>48</a>    </span><span class="kw">pub </span>quotas: AsyncRedisClient,
+<a href=#49 id=49 data-nosnippet>49</a>}
+<a href=#50 id=50 data-nosnippet>50</a>
+<a href=#51 id=51 data-nosnippet>51</a><span class="doccomment">/// Statistics about the Redis client's connection client state.
+<a href=#52 id=52 data-nosnippet>52</a>///
+<a href=#53 id=53 data-nosnippet>53</a>/// Provides information about the current state of Redis connection clients,
+<a href=#54 id=54 data-nosnippet>54</a>/// including the number of active and idle connections.
+<a href=#55 id=55 data-nosnippet>55</a></span><span class="attr">#[derive(Debug)]
+<a href=#56 id=56 data-nosnippet>56</a></span><span class="kw">pub struct </span>RedisClientStats {
+<a href=#57 id=57 data-nosnippet>57</a>    <span class="doccomment">/// The number of connections currently being managed by the pool.
+<a href=#58 id=58 data-nosnippet>58</a>    </span><span class="kw">pub </span>connections: u32,
+<a href=#59 id=59 data-nosnippet>59</a>    <span class="doccomment">/// The number of idle connections.
+<a href=#60 id=60 data-nosnippet>60</a>    </span><span class="kw">pub </span>idle_connections: u32,
+<a href=#61 id=61 data-nosnippet>61</a>    <span class="doccomment">/// The maximum number of connections in the pool.
+<a href=#62 id=62 data-nosnippet>62</a>    </span><span class="kw">pub </span>max_connections: u32,
+<a href=#63 id=63 data-nosnippet>63</a>    <span class="doccomment">/// The number of futures that are currently waiting to get a connection from the pool.
+<a href=#64 id=64 data-nosnippet>64</a>    ///
+<a href=#65 id=65 data-nosnippet>65</a>    /// This number increases when there are not enough connections in the pool.
+<a href=#66 id=66 data-nosnippet>66</a>    </span><span class="kw">pub </span>waiting_for_connection: u32,
+<a href=#67 id=67 data-nosnippet>67</a>}
+<a href=#68 id=68 data-nosnippet>68</a>
+<a href=#69 id=69 data-nosnippet>69</a><span class="doccomment">/// A connection client that can manage either a single Redis instance or a Redis cluster.
+<a href=#70 id=70 data-nosnippet>70</a>///
+<a href=#71 id=71 data-nosnippet>71</a>/// This enum provides a unified interface for Redis operations, supporting both
+<a href=#72 id=72 data-nosnippet>72</a>/// single-instance and cluster configurations.
+<a href=#73 id=73 data-nosnippet>73</a></span><span class="attr">#[derive(Clone)]
+<a href=#74 id=74 data-nosnippet>74</a></span><span class="kw">pub enum </span>AsyncRedisClient {
+<a href=#75 id=75 data-nosnippet>75</a>    <span class="doccomment">/// Contains a connection pool to a Redis cluster.
+<a href=#76 id=76 data-nosnippet>76</a>    </span>Cluster(pool::CustomClusterPool),
+<a href=#77 id=77 data-nosnippet>77</a>    <span class="doccomment">/// Contains a connection pool to a single Redis instance.
+<a href=#78 id=78 data-nosnippet>78</a>    </span>Single(pool::CustomSinglePool),
+<a href=#79 id=79 data-nosnippet>79</a>}
+<a href=#80 id=80 data-nosnippet>80</a>
+<a href=#81 id=81 data-nosnippet>81</a><span class="kw">impl </span>AsyncRedisClient {
+<a href=#82 id=82 data-nosnippet>82</a>    <span class="doccomment">/// Creates a new connection client for a Redis cluster.
+<a href=#83 id=83 data-nosnippet>83</a>    ///
+<a href=#84 id=84 data-nosnippet>84</a>    /// This method initializes a connection client that can communicate with multiple Redis nodes
+<a href=#85 id=85 data-nosnippet>85</a>    /// in a cluster configuration. The client is configured with the specified servers and options.
+<a href=#86 id=86 data-nosnippet>86</a>    ///
+<a href=#87 id=87 data-nosnippet>87</a>    /// The client uses a custom cluster manager that implements a specific connection recycling
+<a href=#88 id=88 data-nosnippet>88</a>    /// strategy, ensuring optimal performance and reliability in cluster environments.
+<a href=#89 id=89 data-nosnippet>89</a>    </span><span class="kw">pub fn </span>cluster&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#90 id=90 data-nosnippet>90</a>        name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+<a href=#91 id=91 data-nosnippet>91</a>        servers: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+<a href=#92 id=92 data-nosnippet>92</a>        opts: <span class="kw-2">&amp;</span>RedisConfigOptions,
+<a href=#93 id=93 data-nosnippet>93</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, RedisError&gt; {
+<a href=#94 id=94 data-nosnippet>94</a>        <span class="kw">let </span>servers = servers
+<a href=#95 id=95 data-nosnippet>95</a>            .into_iter()
+<a href=#96 id=96 data-nosnippet>96</a>            .map(|s| s.to_owned())
+<a href=#97 id=97 data-nosnippet>97</a>            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+<a href=#98 id=98 data-nosnippet>98</a>
+<a href=#99 id=99 data-nosnippet>99</a>        <span class="comment">// We use our custom cluster manager which performs recycling in a different way from the
+<a href=#100 id=100 data-nosnippet>100</a>        // default manager.
+<a href=#101 id=101 data-nosnippet>101</a>        </span><span class="kw">let </span>manager = pool::CustomClusterManager::new(name, servers, <span class="bool-val">false</span>, opts.clone())
+<a href=#102 id=102 data-nosnippet>102</a>            .map_err(RedisError::Redis)<span class="question-mark">?</span>;
+<a href=#103 id=103 data-nosnippet>103</a>
+<a href=#104 id=104 data-nosnippet>104</a>        <span class="kw">let </span>pool = <span class="self">Self</span>::build_pool(manager, opts)<span class="question-mark">?</span>;
+<a href=#105 id=105 data-nosnippet>105</a>
+<a href=#106 id=106 data-nosnippet>106</a>        <span class="prelude-val">Ok</span>(AsyncRedisClient::Cluster(pool))
+<a href=#107 id=107 data-nosnippet>107</a>    }
+<a href=#108 id=108 data-nosnippet>108</a>
+<a href=#109 id=109 data-nosnippet>109</a>    <span class="doccomment">/// Creates a new connection client for a single Redis instance.
+<a href=#110 id=110 data-nosnippet>110</a>    ///
+<a href=#111 id=111 data-nosnippet>111</a>    /// This method initializes a connection client that communicates with a single Redis server.
+<a href=#112 id=112 data-nosnippet>112</a>    /// The client is configured with the specified server URL and options.
+<a href=#113 id=113 data-nosnippet>113</a>    ///
+<a href=#114 id=114 data-nosnippet>114</a>    /// The client uses a custom single manager that implements a specific connection recycling
+<a href=#115 id=115 data-nosnippet>115</a>    /// strategy, ensuring optimal performance and reliability in single-instance environments.
+<a href=#116 id=116 data-nosnippet>116</a>    </span><span class="kw">pub fn </span>single(
+<a href=#117 id=117 data-nosnippet>117</a>        name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+<a href=#118 id=118 data-nosnippet>118</a>        server: <span class="kw-2">&amp;</span>str,
+<a href=#119 id=119 data-nosnippet>119</a>        opts: <span class="kw-2">&amp;</span>RedisConfigOptions,
+<a href=#120 id=120 data-nosnippet>120</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, RedisError&gt; {
+<a href=#121 id=121 data-nosnippet>121</a>        <span class="comment">// We use our custom single manager which performs recycling in a different way from the
+<a href=#122 id=122 data-nosnippet>122</a>        // default manager.
+<a href=#123 id=123 data-nosnippet>123</a>        </span><span class="kw">let </span>manager = pool::CustomSingleManager::new(name, server, opts.clone())
+<a href=#124 id=124 data-nosnippet>124</a>            .map_err(RedisError::Redis)<span class="question-mark">?</span>;
+<a href=#125 id=125 data-nosnippet>125</a>
+<a href=#126 id=126 data-nosnippet>126</a>        <span class="kw">let </span>pool = <span class="self">Self</span>::build_pool(manager, opts)<span class="question-mark">?</span>;
+<a href=#127 id=127 data-nosnippet>127</a>
+<a href=#128 id=128 data-nosnippet>128</a>        <span class="prelude-val">Ok</span>(AsyncRedisClient::Single(pool))
+<a href=#129 id=129 data-nosnippet>129</a>    }
+<a href=#130 id=130 data-nosnippet>130</a>
+<a href=#131 id=131 data-nosnippet>131</a>    <span class="doccomment">/// Acquires a connection from the pool.
+<a href=#132 id=132 data-nosnippet>132</a>    ///
+<a href=#133 id=133 data-nosnippet>133</a>    /// Returns a new [`AsyncRedisConnection`] that can be used to execute Redis commands.
+<a href=#134 id=134 data-nosnippet>134</a>    /// The connection is automatically returned to the pool when dropped.
+<a href=#135 id=135 data-nosnippet>135</a>    </span><span class="kw">pub async fn </span>get_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsyncRedisConnection, RedisError&gt; {
+<a href=#136 id=136 data-nosnippet>136</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#137 id=137 data-nosnippet>137</a>            <span class="self">Self</span>::Cluster(pool) =&gt; pool.get().<span class="kw">await</span>.map(AsyncRedisConnection::Cluster),
+<a href=#138 id=138 data-nosnippet>138</a>            <span class="self">Self</span>::Single(pool) =&gt; pool.get().<span class="kw">await</span>.map(AsyncRedisConnection::Single),
+<a href=#139 id=139 data-nosnippet>139</a>        }
+<a href=#140 id=140 data-nosnippet>140</a>        .map_err(RedisError::Pool)
+<a href=#141 id=141 data-nosnippet>141</a>    }
+<a href=#142 id=142 data-nosnippet>142</a>
+<a href=#143 id=143 data-nosnippet>143</a>    <span class="doccomment">/// Returns statistics about the current state of the connection pool.
+<a href=#144 id=144 data-nosnippet>144</a>    ///
+<a href=#145 id=145 data-nosnippet>145</a>    /// Provides information about the number of active and idle connections in the pool,
+<a href=#146 id=146 data-nosnippet>146</a>    /// which can be useful for monitoring and debugging purposes.
+<a href=#147 id=147 data-nosnippet>147</a>    </span><span class="kw">pub fn </span>stats(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RedisClientStats {
+<a href=#148 id=148 data-nosnippet>148</a>        <span class="kw">let </span>status = <span class="kw">match </span><span class="self">self </span>{
+<a href=#149 id=149 data-nosnippet>149</a>            <span class="self">Self</span>::Cluster(pool) =&gt; pool.status(),
+<a href=#150 id=150 data-nosnippet>150</a>            <span class="self">Self</span>::Single(pool) =&gt; pool.status(),
+<a href=#151 id=151 data-nosnippet>151</a>        };
+<a href=#152 id=152 data-nosnippet>152</a>
+<a href=#153 id=153 data-nosnippet>153</a>        RedisClientStats {
+<a href=#154 id=154 data-nosnippet>154</a>            idle_connections: status.available <span class="kw">as </span>u32,
+<a href=#155 id=155 data-nosnippet>155</a>            connections: status.size <span class="kw">as </span>u32,
+<a href=#156 id=156 data-nosnippet>156</a>            max_connections: status.max_size <span class="kw">as </span>u32,
+<a href=#157 id=157 data-nosnippet>157</a>            waiting_for_connection: status.waiting <span class="kw">as </span>u32,
+<a href=#158 id=158 data-nosnippet>158</a>        }
+<a href=#159 id=159 data-nosnippet>159</a>    }
+<a href=#160 id=160 data-nosnippet>160</a>
+<a href=#161 id=161 data-nosnippet>161</a>    <span class="doccomment">/// Runs the `predicate` on the pool blocking it.
+<a href=#162 id=162 data-nosnippet>162</a>    ///
+<a href=#163 id=163 data-nosnippet>163</a>    /// If the `predicate` returns `false` the object will be removed from pool.
+<a href=#164 id=164 data-nosnippet>164</a>    </span><span class="kw">pub fn </span>retain(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>predicate: <span class="kw">impl </span>FnMut(Metrics) -&gt; bool) {
+<a href=#165 id=165 data-nosnippet>165</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#166 id=166 data-nosnippet>166</a>            <span class="self">Self</span>::Cluster(pool) =&gt; {
+<a href=#167 id=167 data-nosnippet>167</a>                pool.retain(|<span class="kw">_</span>, metrics| predicate(metrics));
+<a href=#168 id=168 data-nosnippet>168</a>            }
+<a href=#169 id=169 data-nosnippet>169</a>            <span class="self">Self</span>::Single(pool) =&gt; {
+<a href=#170 id=170 data-nosnippet>170</a>                pool.retain(|<span class="kw">_</span>, metrics| predicate(metrics));
+<a href=#171 id=171 data-nosnippet>171</a>            }
+<a href=#172 id=172 data-nosnippet>172</a>        }
+<a href=#173 id=173 data-nosnippet>173</a>    }
+<a href=#174 id=174 data-nosnippet>174</a>
+<a href=#175 id=175 data-nosnippet>175</a>    <span class="doccomment">/// Builds a [`Pool`] given a type implementing [`Manager`] and [`RedisConfigOptions`].
+<a href=#176 id=176 data-nosnippet>176</a>    </span><span class="kw">fn </span>build_pool&lt;M: Manager + <span class="lifetime">'static</span>, W: From&lt;Object&lt;M&gt;&gt; + <span class="lifetime">'static</span>&gt;(
+<a href=#177 id=177 data-nosnippet>177</a>        manager: M,
+<a href=#178 id=178 data-nosnippet>178</a>        opts: <span class="kw-2">&amp;</span>RedisConfigOptions,
+<a href=#179 id=179 data-nosnippet>179</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Pool&lt;M, W&gt;, BuildError&gt; {
+<a href=#180 id=180 data-nosnippet>180</a>        <span class="kw">let </span>result = Pool::builder(manager)
+<a href=#181 id=181 data-nosnippet>181</a>            .max_size(opts.max_connections <span class="kw">as </span>usize)
+<a href=#182 id=182 data-nosnippet>182</a>            .create_timeout(opts.create_timeout.map(Duration::from_secs))
+<a href=#183 id=183 data-nosnippet>183</a>            .recycle_timeout(opts.recycle_timeout.map(Duration::from_secs))
+<a href=#184 id=184 data-nosnippet>184</a>            .wait_timeout(opts.wait_timeout.map(Duration::from_secs))
+<a href=#185 id=185 data-nosnippet>185</a>            .runtime(Runtime::Tokio1)
+<a href=#186 id=186 data-nosnippet>186</a>            .build();
+<a href=#187 id=187 data-nosnippet>187</a>
+<a href=#188 id=188 data-nosnippet>188</a>        <span class="kw">let </span>idle_timeout = opts.idle_timeout;
+<a href=#189 id=189 data-nosnippet>189</a>        <span class="kw">let </span>refresh_interval = opts.idle_timeout / <span class="number">2</span>;
+<a href=#190 id=190 data-nosnippet>190</a>        <span class="kw">if let </span><span class="prelude-val">Ok</span>(pool) = result.clone() {
+<a href=#191 id=191 data-nosnippet>191</a>            <span class="macro">relay_system::spawn!</span>(<span class="kw">async move </span>{
+<a href=#192 id=192 data-nosnippet>192</a>                <span class="kw">loop </span>{
+<a href=#193 id=193 data-nosnippet>193</a>                    pool.retain(|<span class="kw">_</span>, metrics| {
+<a href=#194 id=194 data-nosnippet>194</a>                        metrics.last_used() &lt; Duration::from_secs(idle_timeout)
+<a href=#195 id=195 data-nosnippet>195</a>                    });
+<a href=#196 id=196 data-nosnippet>196</a>                    tokio::time::sleep(Duration::from_secs(refresh_interval)).<span class="kw">await</span>;
+<a href=#197 id=197 data-nosnippet>197</a>                }
+<a href=#198 id=198 data-nosnippet>198</a>            });
+<a href=#199 id=199 data-nosnippet>199</a>        }
+<a href=#200 id=200 data-nosnippet>200</a>
+<a href=#201 id=201 data-nosnippet>201</a>        result
+<a href=#202 id=202 data-nosnippet>202</a>    }
+<a href=#203 id=203 data-nosnippet>203</a>}
+<a href=#204 id=204 data-nosnippet>204</a>
+<a href=#205 id=205 data-nosnippet>205</a><span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>AsyncRedisClient {
+<a href=#206 id=206 data-nosnippet>206</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#208 id=208 data-nosnippet>208</a>            AsyncRedisClient::Cluster(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">"AsyncRedisPool::Cluster"</span>),
+<a href=#209 id=209 data-nosnippet>209</a>            AsyncRedisClient::Single(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">"AsyncRedisPool::Single"</span>),
+<a href=#210 id=210 data-nosnippet>210</a>        }
+<a href=#211 id=211 data-nosnippet>211</a>    }
+<a href=#212 id=212 data-nosnippet>212</a>}
+<a href=#213 id=213 data-nosnippet>213</a>
+<a href=#214 id=214 data-nosnippet>214</a><span class="doccomment">/// A connection to either a single Redis instance or a Redis cluster.
+<a href=#215 id=215 data-nosnippet>215</a>///
+<a href=#216 id=216 data-nosnippet>216</a>/// This enum provides a unified interface for Redis operations, abstracting away the
+<a href=#217 id=217 data-nosnippet>217</a>/// differences between single-instance and cluster connections. It implements the
+<a href=#218 id=218 data-nosnippet>218</a>/// [`redis::aio::ConnectionLike`] trait, allowing it to be used with Redis commands
+<a href=#219 id=219 data-nosnippet>219</a>/// regardless of the underlying connection type.
+<a href=#220 id=220 data-nosnippet>220</a></span><span class="kw">pub enum </span>AsyncRedisConnection {
+<a href=#221 id=221 data-nosnippet>221</a>    <span class="doccomment">/// A connection to a Redis cluster.
+<a href=#222 id=222 data-nosnippet>222</a>    </span>Cluster(pool::CustomClusterConnection),
+<a href=#223 id=223 data-nosnippet>223</a>    <span class="doccomment">/// A connection to a single Redis instance.
+<a href=#224 id=224 data-nosnippet>224</a>    </span>Single(pool::CustomSingleConnection),
+<a href=#225 id=225 data-nosnippet>225</a>}
+<a href=#226 id=226 data-nosnippet>226</a>
+<a href=#227 id=227 data-nosnippet>227</a><span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>AsyncRedisConnection {
+<a href=#228 id=228 data-nosnippet>228</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+<a href=#229 id=229 data-nosnippet>229</a>        <span class="kw">let </span>name = <span class="kw">match </span><span class="self">self </span>{
+<a href=#230 id=230 data-nosnippet>230</a>            <span class="self">Self</span>::Cluster(<span class="kw">_</span>) =&gt; <span class="string">"Cluster"</span>,
+<a href=#231 id=231 data-nosnippet>231</a>            <span class="self">Self</span>::Single(<span class="kw">_</span>) =&gt; <span class="string">"Single"</span>,
+<a href=#232 id=232 data-nosnippet>232</a>        };
+<a href=#233 id=233 data-nosnippet>233</a>        f.debug_tuple(name).finish()
+<a href=#234 id=234 data-nosnippet>234</a>    }
+<a href=#235 id=235 data-nosnippet>235</a>}
+<a href=#236 id=236 data-nosnippet>236</a>
+<a href=#237 id=237 data-nosnippet>237</a><span class="kw">impl </span>redis::aio::ConnectionLike <span class="kw">for </span>AsyncRedisConnection {
+<a href=#238 id=238 data-nosnippet>238</a>    <span class="kw">fn </span>req_packed_command&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Cmd) -&gt; RedisFuture&lt;<span class="lifetime">'a</span>, Value&gt; {
+<a href=#239 id=239 data-nosnippet>239</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#240 id=240 data-nosnippet>240</a>            <span class="self">Self</span>::Cluster(conn) =&gt; conn.req_packed_command(cmd),
+<a href=#241 id=241 data-nosnippet>241</a>            <span class="self">Self</span>::Single(conn) =&gt; conn.req_packed_command(cmd),
+<a href=#242 id=242 data-nosnippet>242</a>        }
+<a href=#243 id=243 data-nosnippet>243</a>    }
+<a href=#244 id=244 data-nosnippet>244</a>
+<a href=#245 id=245 data-nosnippet>245</a>    <span class="kw">fn </span>req_packed_commands&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#246 id=246 data-nosnippet>246</a>        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>,
+<a href=#247 id=247 data-nosnippet>247</a>        cmd: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Pipeline,
+<a href=#248 id=248 data-nosnippet>248</a>        offset: usize,
+<a href=#249 id=249 data-nosnippet>249</a>        count: usize,
+<a href=#250 id=250 data-nosnippet>250</a>    ) -&gt; RedisFuture&lt;<span class="lifetime">'a</span>, Vec&lt;Value&gt;&gt; {
+<a href=#251 id=251 data-nosnippet>251</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#252 id=252 data-nosnippet>252</a>            <span class="self">Self</span>::Cluster(conn) =&gt; conn.req_packed_commands(cmd, offset, count),
+<a href=#253 id=253 data-nosnippet>253</a>            <span class="self">Self</span>::Single(conn) =&gt; conn.req_packed_commands(cmd, offset, count),
+<a href=#254 id=254 data-nosnippet>254</a>        }
+<a href=#255 id=255 data-nosnippet>255</a>    }
+<a href=#256 id=256 data-nosnippet>256</a>
+<a href=#257 id=257 data-nosnippet>257</a>    <span class="kw">fn </span>get_db(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+<a href=#258 id=258 data-nosnippet>258</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#259 id=259 data-nosnippet>259</a>            <span class="self">Self</span>::Cluster(conn) =&gt; conn.get_db(),
+<a href=#260 id=260 data-nosnippet>260</a>            <span class="self">Self</span>::Single(conn) =&gt; conn.get_db(),
+<a href=#261 id=261 data-nosnippet>261</a>        }
+<a href=#262 id=262 data-nosnippet>262</a>    }
+<a href=#263 id=263 data-nosnippet>263</a>}
+</code></pre></div></section></main></body></html>

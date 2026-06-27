@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_AI_OPERATION"],"fn":["calculate_costs","enrich_ai_event_data","enrich_ai_span","infer_ai_operation_type"],"struct":["CalculatedCost","UsedTokens"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AggregateMetricsError","FlushBatching"],"struct":["Aggregator","AggregatorConfig","Partition","PartitionIter"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_attributes","get_field_types","get_matching_scoped_paths","get_type_paths_from_type"],"struct":["FieldsWithAttribute","PiiFinder","TypeAndField"]};

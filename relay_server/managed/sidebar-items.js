@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ItemAction"],"struct":["Managed","ManagedEnvelope","RecordKeeper","Rejected","Split"],"trait":["Counted","ManagedResult","OutcomeError","RetainMut"],"type":["Quantities"]};
